@@ -14,7 +14,7 @@ export default function Player() {
                     <BsArrowLeft onClick={()=>{navigate(-1)}} />
                 </div>
                 <div className="video">
-                    <video src={video}  loop controls ></video>
+                    <video src={video} autoPlay loop controls ></video>
                 </div>
             </div>
         </Container>

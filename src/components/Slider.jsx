@@ -2,17 +2,17 @@ import React from 'react'
 import CardSlider from './CardSlider'
 
 export default function Slider({ movies }) {
-    const getMovieFromRange = (from, to) => {
-        return movies.slice(from, to);
-    }
-    return (
-        <div>
-            <CardSlider title="Trending Now" data={getMovieFromRange(0, 10)} />
-            <CardSlider title="New Releases" data={getMovieFromRange(10, 20)} />
-            <CardSlider title="Blockbuster Movies" data={getMovieFromRange(20, 30)} />
-            <CardSlider title="Popular on Netflix" data={getMovieFromRange(30, 40)} />
-            <CardSlider title="Action" data={getMovieFromRange(40, 50)} />
-            <CardSlider title="Epics" data={getMovieFromRange(50, 60)} />
-        </div>
-    )
+  const getMoviesFromRange = (from, to) => {
+    return movies.slice(from, to);
+  };
+  return (
+    <div>
+      <CardSlider data={getMoviesFromRange(0, 10)} title="Trending Now" />
+      <CardSlider data={getMoviesFromRange(10, 20)} title="New Releases" />
+      <CardSlider data={getMoviesFromRange(20, 30)} title="Blockbuster Movies" />
+      <CardSlider data={getMoviesFromRange(30, 40)} title="Popular on Netflix" />
+      <CardSlider data={getMoviesFromRange(40, 50)} title="Action Movies" />
+      <CardSlider data={getMoviesFromRange(50, 60)} title="Epics" />
+    </div>
+  )
 }

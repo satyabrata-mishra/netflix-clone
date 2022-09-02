@@ -1,64 +1,108 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom';
 import video from '../assets/video.mp4';
 import styled from 'styled-components';
 import { IoPlayCircleSharp } from "react-icons/io5";
 import { RiThumbUpFill, RiThumbDownFill } from "react-icons/ri";
-import { BsCheck } from "react-icons/bs";
+import { IoMdRemoveCircleOutline } from "react-icons/io";
 import { AiOutlinePlus } from "react-icons/ai";
 import { BiChevronDown } from "react-icons/bi";
+import { onAuthStateChanged, updateCurrentUser } from 'firebase/auth';
+import { firebaseAuth } from '../utils/firebase-config';
+import { host } from '../utils/constanst';
+
+export default function Card({ movie, isLiked = false, getAllMovies }) {
+  const [isHovered, setisHovered] = useState(false);
+  const [email, setemail] = useState(undefined);
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(firebaseAuth, (currentUser) => {
+      if (currentUser) {
+        setemail(currentUser.email);
+      } else
+        navigate("/");
+    });
+  }, [])
 
 
-export default function Card({ movie, isLiked = false }) {
-    const [isHovered, setisHovered] = useState(false);
-    const navigate = useNavigate();
-    return (
-        <Container onMouseEnter={() => { setisHovered(true) }} onMouseLeave={() => { setisHovered(false) }}>
-            <img src={`https://image.tmdb.org/t/p/w500${movie.image}`} alt="" />
-            {
-                isHovered && (
-                    <div className="hover">
-                        <div className="image-video-container">
-                            <img src={`https://image.tmdb.org/t/p/w500${movie.image}`} alt=""
-                                onClick={() => { navigate("/player") }} />
-                            <video src={video} autoPlay muted loop
-                                onClick={() => { navigate("/player") }}
-                            ></video>
-                        </div>
-                        <div className="info-container flex column">
-                            <h3 className='name' onClick={() => { navigate("/player") }}>
-                                {movie.name}
-                            </h3>
-                            <div className="icons flex j-between">
-                                <div className="controls flex">
-                                    <IoPlayCircleSharp title='Play' onClick={() => { navigate("/player") }} />
-                                    <RiThumbUpFill title='Like' />
-                                    <RiThumbDownFill title='Dislike' />
-                                    {
-                                        isLiked ?
-                                            (<BsCheck title='Remove From List' />) :
-                                            (<AiOutlinePlus title='Add To My List' />)
-                                    }
-                                </div>
-                                <div className="info">
-                                    <BiChevronDown title='More info' />
-                                </div>
-                                <div className="genres flex">
-                                    <ul className='flex'>
-                                        {
-                                            movie.genres.map((genre,index) =>
-                                                <li key={index}>{genre}</li>
-                                                )
-                                        }
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )
-            }
-        </Container>
-    )
+
+  const addToList = async () => {
+    try {
+      const response = await fetch(`${host}/netflixapp/add`, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, data: movie })
+      });
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  const deleteFromList = async (movie) => {
+    try {
+      const response = await fetch(`${host}/netflixapp/delete`, {
+        method: 'PUT',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, movieId: movie.id })
+      });
+      getAllMovies();
+    } catch (error) {
+      console.log(error.message);
+    }
+  };
+  return (
+    <Container onMouseEnter={() => { setisHovered(true) }} onMouseLeave={() => { setisHovered(false) }}>
+      <img src={`https://image.tmdb.org/t/p/w500${movie.image}`} alt="" />
+      {
+        isHovered && (
+          <div className="hover">
+            <div className="image-video-container">
+              <img src={`https://image.tmdb.org/t/p/w500${movie.image}`} alt=""
+                onClick={() => { navigate("/player") }} />
+              <video src={video} autoPlay muted loop
+                onClick={() => { navigate("/player") }}
+              ></video>
+            </div>
+            <div className="info-container flex column">
+              <h3 className='name' onClick={() => navigate("/player")}>
+                {movie.name}
+              </h3>
+              <div className="icons flex j-between">
+                <div className="controls flex">
+                  <IoPlayCircleSharp title='Play' onClick={() => navigate("/player")} />
+                  <RiThumbUpFill title='Like' />
+                  <RiThumbDownFill title='Dislike' />
+                  {
+                    isLiked ?
+                      (<IoMdRemoveCircleOutline title='Remove From List' onClick={() => deleteFromList(movie)} />) :
+                      (<AiOutlinePlus title='Add To My List' onClick={() => addToList()} />)
+                  }
+                </div>
+                <div className="info">
+                  <BiChevronDown title='More info' />
+                </div>
+                <div className="genres flex">
+                  <ul className='flex'>
+                    {
+                      movie.genres.map((genre, index) =>
+                        <li key={index}>{genre}</li>
+                      )
+                    }
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </div>
+        )
+      }
+    </Container>
+  )
 }
 const Container = styled.div`
     max-width: 230px;

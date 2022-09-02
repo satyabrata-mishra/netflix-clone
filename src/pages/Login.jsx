@@ -15,7 +15,7 @@ export default function Login() {
   const handleLogin = async () => {
     try {
       const { email, password } = formValues;
-      await signInWithEmailAndPassword(firebaseAuth, email, password);
+      const user = await signInWithEmailAndPassword(firebaseAuth, email, password);
     } catch (error) {
       console.log(error.message);
     }

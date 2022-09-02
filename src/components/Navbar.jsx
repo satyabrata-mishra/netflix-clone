@@ -1,27 +1,19 @@
 import React, { useState } from 'react'
 import styled from 'styled-components';
 import logo from '../assets/logo.png';
-import { Link,useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { firebaseAuth } from "../utils/firebase-config";
 import { signOut } from "firebase/auth";
-import { onAuthStateChanged } from 'firebase/auth';
 import { FaPowerOff, FaSearch } from 'react-icons/fa';
 
 export default function Navbar({ isScrolled }) {
-    const navigate = useNavigate();
     const [showSearch, setshowSearch] = useState(false);
     const [inputHover, setinputHover] = useState(false);
     const links = [
-        { name: "Home", link: "/home" },
-        { name: "Tv Shows", link: "/tv" },
+        { name: "Home", link: "/" },
         { name: "Movies", link: "/movies" },
         { name: "My List", link: "/mylist" },
     ];
-    onAuthStateChanged(firebaseAuth, (currentUser) => {
-        if (!currentUser) {
-          navigate("/");
-        }
-      });
     return (
         <Container>
             <nav className={`${isScrolled ? "scrolled" : ""} flex`}>

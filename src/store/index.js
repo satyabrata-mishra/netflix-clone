@@ -27,9 +27,14 @@ export const getGenres = createAsyncThunk("netflix/genres", async () => {
 
 export const fetchMovies = createAsyncThunk("netflix/trending", async ({ type }, thunkApi) => {
     const { netflix: { genres }, } = thunkApi.getState();
-    return  await getRawData(`${TMDB_BASE_URL}/trending/${type}/week?api_key=${api_key}`,genres,true);
+    return await getRawData(`${TMDB_BASE_URL}/trending/${type}/week?api_key=${api_key}`, genres, true);
 });
 
+
+export const fetchDataByGenre = createAsyncThunk("netflix/genre", async ({ genre, type }, thunkApi) => {
+    const { netflix: { genres }, } = thunkApi.getState();
+    return await getRawData(`https://api.themoviedb.org/3/discover/${type}?api_key=${api_key}&with_genres=${genre}`, genres);
+});
 
 const getRawData = async (api, genres, paging) => {
     const moviesArray = [];
@@ -41,12 +46,11 @@ const getRawData = async (api, genres, paging) => {
         const json = await response.json();
         const { results } = json;
         createArrayFromRawData(results, moviesArray, genres);
-        return moviesArray;
     }
+    return moviesArray;
 };
 
 const createArrayFromRawData = (array, moviesArray, genres) => {
-    // console.log(array);
     array.forEach((movie) => {
         const movieGenres = [];
         movie.genre_ids.forEach((genre) => {
@@ -58,10 +62,11 @@ const createArrayFromRawData = (array, moviesArray, genres) => {
                 id: movie.id,
                 name: movie?.original_name ? movie.original_name : movie.original_title,
                 image: movie.backdrop_path,
-                genres: movieGenres.slice(0, 1),
+                genres: movieGenres.slice(0, 3),
             });
     });
 };
+
 
 const NetflixSlice = createSlice({
     name: "Netflix",
@@ -72,6 +77,9 @@ const NetflixSlice = createSlice({
             state.genresLoaded = true;
         });
         builder.addCase(fetchMovies.fulfilled, (state, action) => {
+            state.movies = action.payload;
+        });
+        builder.addCase(fetchDataByGenre.fulfilled, (state, action) => {
             state.movies = action.payload;
         });
     },

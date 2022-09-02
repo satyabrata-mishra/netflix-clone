@@ -33,7 +33,6 @@ export default function Netflix() {
     setisScrolled(window.pageYOffset === 0 ? false : true);
     return () => (window.onscroll = null);
   };
-  console.log(movies);
   return (
     <Container>
       <Navbar isScrolled={isScrolled} />
@@ -52,7 +51,6 @@ export default function Netflix() {
             <AiOutlineInfoCircle /> Info
           </button>
         </div>
-
       </div>
       <Slider movies={movies} />
     </Container>

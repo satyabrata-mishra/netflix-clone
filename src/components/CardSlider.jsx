@@ -29,7 +29,7 @@ export default function CardSlider({ title, data }) {
                 </div>
                 <div className='flex slider' ref={listRef}>
                     {data.map((movie, index) => {
-                        return <Card movie={movie} index={index} key={index} />
+                        return <Card movie={movie} key={index} />
                     })}
                 </div>
                 <div className={`slider-action right ${showControls ? "" : "none"} flex j-center a-center`}>
